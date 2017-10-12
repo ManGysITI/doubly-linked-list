@@ -20,7 +20,7 @@ class LinkedList {
             this._tail = node;
         }
         this.length++;
-        return node;
+        return this;
     }
 
     head() {
@@ -31,28 +31,44 @@ class LinkedList {
         return this._head.data;
     }
 
-    at(index) {}
+    at(index) {
+        let node = this._head;
+        if (!(this.length === 0 || index < 0 || index >= this.length)) {
+            for (let count = 0; count < index; count++)
+                node = node.next;
+            return node.data;
+        }
+    }
 
     insertAt(index, data) {
-        var node = new Node(data);
-        if (index < 0 || (index > this.length - 1 && this.length !== 0)) {
-            return false;
+        if (index >= this.length) {
+            this.append(data)
+        } else {
+            let newNode = new Node(data);
+
+            let oldNode = this._head;
+            for (let i = 0; i < this.length; i++) {
+                if (i === index) {
+                    let prevOfOldNode = oldNode.prev;
+
+                    newNode.prev = prevOfOldNode;
+                    if (prevOfOldNode) {
+                        prevOfOldNode.next = newNode;
+                    }
+                    newNode.next = oldNode;
+                    oldNode.prev = newNode;
+
+                    this.length++;
+
+                    break;
+                } else {
+                    oldNode = oldNode.next;
+                }
+            }
         }
 
-        if (index === 0) {
-            if (this.isEmpty()) {
-                this.append(data);
-                return this;
-            } else {
-                node.next = this._head;
-                this._head.prev = node;
-                this._head = node;
-                this.length++;
-            }
-            return this;
+        return this;
 
-
-    }
     }
 
     isEmpty() {
@@ -60,17 +76,64 @@ class LinkedList {
     }
 
     clear() {
-        this._head = null;
-        this._tail = null;
+        this._head.data = null;
+        this._tail.data = null;
         this.length = 0;
         return this;
     }
 
-    deleteAt(index) {}
+    deleteAt(index) {
+        let nodeToDelete = this._head;
+        for (let i = 0; i < this.length; i++) {
+            if (i === index) {
+                const prevOfNodeToDelete = nodeToDelete.prev;
+                const nextOfNodeToDelete = nodeToDelete.next;
+                if (prevOfNodeToDelete) {
+                    prevOfNodeToDelete.next = nextOfNodeToDelete;
+                }
+                if (nextOfNodeToDelete) {
+                    nextOfNodeToDelete.prev = prevOfNodeToDelete;
+                }
+                this.length--;
 
-    reverse() {}
+                break;
+            } else {
+                nodeToDelete = nodeToDelete.next;
+            }
+        }
 
-    indexOf(data) {}
+        return this;
+    }
+
+    reverse() {
+        let reversedList = new LinkedList();
+
+        let currentNode = this._tail;
+        while (currentNode) {
+
+            reversedList.append(currentNode.data);
+            currentNode = currentNode.prev;
+        }
+
+        this._head = reversedList._head;
+        this._tail = reversedList._tail;
+
+        return this;
+    }
+
+    indexOf(data) {
+        let currentNode = this._head;
+
+        for (let i = 0; i < this.length; i++) {
+            if (currentNode.data === data) {
+                return i;
+            } else {
+                currentNode = currentNode.next;
+            }
+        }
+
+        return -1;
+    }
 }
 
 module.exports = LinkedList;
